@@ -3,11 +3,10 @@ import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
 import logging
-import pandas as pd
 
 load_dotenv()
 
-# Configure logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -104,7 +103,7 @@ class IMDBDBTable:
         query = sql.SQL("INSERT INTO {table} ({fields}) VALUES ({values}) ON CONFLICT (\"Title\", \"Year\") DO NOTHING").format(
             table=table_name, fields=columns, values=values)
 
-        # Convert DataFrame rows to tuples
+        #Perdarymas į tuple formatą.
         data = [tuple(row) for row in df.to_numpy()]
         try:
             with self.db_connection.connection.cursor() as cursor:

@@ -23,23 +23,22 @@ def time_to_minutes(time_str):
 
 
 def scrape_imdb_data(url):
-    # Setup Chrome WebDriver
+
     driver_service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=driver_service)
 
     try:
-        # Navigate to the IMDb movie chart page
-        driver.get(url)
-        time.sleep(5)  # Add a short delay to ensure page loads completely (adjust as needed)
 
-        # Find elements for movie details
+        driver.get(url)
+        time.sleep(5)
+
+
         movie_titles = driver.find_elements(By.XPATH, '//*[@id="__next"]/main/div/div[3]/section/div/div[2]/div/ul/li/div[2]/div/div/div[2]/a/h3')
         movie_years = driver.find_elements(By.XPATH, '//*[@id="__next"]/main/div/div[3]/section/div/div[2]/div/ul/li/div[2]/div/div/div[3]/span[1]')
         movie_lengths = driver.find_elements(By.XPATH, '//*[@id="__next"]/main/div/div[3]/section/div/div[2]/div/ul/li/div[2]/div/div/div[3]/span[2]')
         movie_rates = driver.find_elements(By.XPATH, '//*[@id="__next"]/main/div/div[3]/section/div/div[2]/div/ul/li/div[2]/div/div/span/div/span')
         movie_group = driver.find_elements(By.XPATH, '//*[@id="__next"]/main/div/div[3]/section/div/div[2]/div/ul/li/div[2]/div/div/div[3]/span[3]')
 
-        # Ensure lists are of the same length
         min_length = min(len(movie_titles), len(movie_years), len(movie_rates), len(movie_lengths), len(movie_group))
 
         data = []
@@ -72,12 +71,11 @@ def main():
     url = 'https://www.imdb.com/chart/moviemeter/?ref_=nv_mv_mpm'
     imdb_data = scrape_imdb_data(url)
 
-    # Initialize the database table class
     IMDB_table = IMDBDBTable()
 
     if imdb_data is not None and not imdb_data.empty:
         try:
-            # Insert the data into the database
+
             IMDB_table.insert_data(imdb_data)
         except Exception as e:
             logger.error(f"Error inserting data into database: {e}")
@@ -85,7 +83,7 @@ def main():
         logger.warning("No data to insert into the database.")
 
     try:
-        # Retrieve and print all data from the database to verify
+        # Kas perkelta į duomenų bazę.
         result = IMDB_table.select_all()
         logger.info("Data retrieved from database:")
         for row in result:
