@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import pandas as pd
-from src.db_connection import IMDBDBTable  # Import the DB class
+from src.db_connection import IMDBDBTable
 import logging
 
 # Configure logging
