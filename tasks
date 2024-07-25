@@ -1,0 +1,27 @@
+
+
+
+Task Completed: The insert_data method in the IMDBDBTable class.
+Implementation Details:
+Inserts data from a Pandas DataFrame into the table using INSERT INTO ... VALUES ... ON CONFLICT DO NOTHING.
+
+Task Completed: Handled in the insert_data method by using ON CONFLICT DO NOTHING.
+Implementation Details:
+Ensures that duplicate entries (based on Title and Year) are not inserted again into the table.
+6. Kodo suskirstymas į atskiras funkcijas
+Task Completed: Throughout both scraping_request.py and db_connection.py.
+Implementation Details:
+Functions such as scrape_imdb_data(), insert_data(), select_all(), update_data(), delete_data(), and drop_table() provide a modular structure.
+Each function is responsible for a specific task, promoting code reusability and readability.
+
+Task Completed: The update_data method in the IMDBDBTable class.
+Implementation Details:
+Uses the SQL UPDATE command to modify existing records based on Title and Year.
+
+Task Completed: The delete_data method in the IMDBDBTable class.
+Implementation Details:
+Uses the SQL DELETE command to remove records from the table based on Title and Year.
+
+Task Completed: The drop_table method in the IMDBDBTable class.
+Implementation Details:
+Uses the SQL DROP TABLE IF EXISTS to delete the table if it exists.

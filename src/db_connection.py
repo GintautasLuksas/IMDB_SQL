@@ -11,7 +11,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
+#### 1. Prisijungimas prie DB, kaip atskira klasė
 class DBEngine:
     def __init__(self):
         self.connection = None
@@ -57,15 +57,16 @@ class DBEngine:
         except psycopg2.Error as e:
             logger.error(f"Error retrieving table schema: {e}")
 
-
+### 2. Klasės kūrimas kiekvienai lentelei
 class IMDBDBTable:
     table_name = "IMDB"
-    columns = ('Title', 'Year', 'Rating', 'Duration_minutes', 'Rating_Amount', 'Group_Category')
+    columns = ('Title', 'Year', 'Rating', 'Duration_minutes', 'Group_Category')
 
     def __init__(self):
         self.db_connection = DBEngine()
         self.create_table()
 
+### 3. Duomenų bazės lentelių kūrimas su Python
     def create_table(self):
         """Create the IMDB table if it doesn't exist."""
         try:
@@ -77,7 +78,6 @@ class IMDBDBTable:
                    "Year" VARCHAR(4),
                    "Rating" VARCHAR(255),
                    "Duration_minutes" INT,
-                   "Rating_Amount" INT,
                    "Group_Category" VARCHAR(10),
                    UNIQUE ("Title", "Year")
                )
@@ -89,6 +89,7 @@ class IMDBDBTable:
             logger.error(f"Error creating table: {e}")
             self.db_connection.connection.rollback()
 
+### 4. Duomenų įrašymas į lenteles
     def insert_data(self, df):
         """Insert data into the IMDB table."""
         if not self.check_table_exists():
@@ -98,6 +99,7 @@ class IMDBDBTable:
         columns = sql.SQL(', ').join(map(sql.Identifier, self.columns))
         values = sql.SQL(', ').join(sql.Placeholder() * len(self.columns))
         table_name = sql.Identifier(self.table_name)
+###5. Dublikatų panaikinimas. ON CONFLICT DO NOTHING.
         query = sql.SQL("INSERT INTO {} ({}) VALUES ({}) ON CONFLICT (\"Title\", \"Year\") DO NOTHING").format(
             table_name, columns, values)
 
@@ -132,3 +134,37 @@ class IMDBDBTable:
         except psycopg2.Error as e:
             logger.error(f"Error retrieving data: {e}")
             return []
+### 7. Duomenų atnaujinimas duomenų bazėje per python naudojant UPDATE komandą.
+    def update_data(self, title, year, new_values):
+        """Update data in the IMDB table based on title and year."""
+        try:
+            set_clause = ', '.join([f"{key} = %s" for key in new_values.keys()])
+            query = sql.SQL(f"UPDATE {self.table_name} SET {set_clause} WHERE \"Title\" = %s AND \"Year\" = %s")
+            self.db_connection.cursor.execute(query, (*new_values.values(), title, year))
+            self.db_connection.connection.commit()
+            logger.info('Data updated successfully!')
+        except psycopg2.Error as e:
+            logger.error(f"Error updating data: {e}")
+            self.db_connection.connection.rollback()
+###8. Duomenų pašalinimas duomenų bazėje per python naudojant DELETE komandą
+    def delete_data(self, title, year):
+        """Delete data from the IMDB table based on title and year."""
+        try:
+            query = sql.SQL(f"DELETE FROM {self.table_name} WHERE \"Title\" = %s AND \"Year\" = %s")
+            self.db_connection.cursor.execute(query, (title, year))
+            self.db_connection.connection.commit()
+            logger.info('Data deleted successfully!')
+        except psycopg2.Error as e:
+            logger.error(f"Error deleting data: {e}")
+            self.db_connection.connection.rollback()
+###9. Lentelių trynimas iš duomenų bazės per python naudojant DROP komandą
+    def drop_table(self):
+        """Drop the IMDB table."""
+        try:
+            query = sql.SQL(f"DROP TABLE IF EXISTS {self.table_name}")
+            self.db_connection.cursor.execute(query)
+            self.db_connection.connection.commit()
+            logger.info('Table dropped successfully!')
+        except psycopg2.Error as e:
+            logger.error(f"Error dropping table: {e}")
+            self.db_connection.connection.rollback()
