@@ -35,16 +35,21 @@ def main():
 
     # 7. Duomenų atnaujinimas duomenų bazėje per python naudojant UPDATE komandą.
     imdb_table.update_data('Movie 1', '2020', {'Rating': '9.1', 'Duration_minutes': 125})
-
+    data = imdb_table.select_all()
+    for row in data:
+        logger.info(row)
 
     # 8. Duomenų pašalinimas duomenų bazėje per python naudojant DELETE komandą
     imdb_table.delete_data('Movie 2', '2021')
-
+    data = imdb_table.select_all()
+    for row in data:
+        logger.info(row)
     # Retrieve and print all data from the database
 
 
     # 9. Lentelių trynimas iš duomenų bazės per pyhton naudojant DROP komandą.
     imdb_table.drop_table()
+
 
 if __name__ == "__main__":
     main()

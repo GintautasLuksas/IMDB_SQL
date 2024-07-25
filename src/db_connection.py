@@ -91,9 +91,7 @@ class IMDBDBTable:
 #4. Duomenų įrašymas į lenteles
     def insert_data(self, df):
         """Insert data into the IMDB table."""
-        if not self.check_table_exists():
-            logger.error("Table does not exist, cannot insert data.")
-            return
+
 
         columns = sql.SQL(', ').join(map(sql.Identifier, self.columns))
         values = sql.SQL(', ').join(sql.Placeholder() * len(self.columns))
@@ -109,7 +107,7 @@ class IMDBDBTable:
             with self.db_connection.connection.cursor() as cursor:
                 cursor.executemany(query, data)
                 self.db_connection.connection.commit()
-            logger.info('Data inserted successfully!')  # 4. Duomenų įrašymas į lenteles
+            logger.info('Data inserted successfully!')
         except psycopg2.Error as e:
             logger.error(f"Error inserting data: {e}")
             self.db_connection.connection.rollback()
